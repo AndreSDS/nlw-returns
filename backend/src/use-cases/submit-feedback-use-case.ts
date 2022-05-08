@@ -28,6 +28,8 @@ export class SubmitFeedbackUseCase {
       throw new Error("Invalid screenshot format ");
     }
 
+    console.log({screenshot: screenshot?.startsWith("data:image/png;base64")});
+
     await this.feedbacksRepository.create({type, comment, screenshot});
 
     await this.mailAdaptor.sendMail({
@@ -36,7 +38,7 @@ export class SubmitFeedbackUseCase {
         `<div style="font-family: sans-serif; font-size: 16px; color: #222;">`,
         `<p>Tipo do feedback: ${type}.</p>`,
         `<p>Comentário: ${comment}.</p>`,
-        `<img src=${screenshot} />`,
+        screenshot ? `<img src=${screenshot} />` : null,
         `</div>`,
       ].join("\n"),
     });

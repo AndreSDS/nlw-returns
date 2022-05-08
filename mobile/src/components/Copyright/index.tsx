@@ -7,7 +7,7 @@ const {container, title} = styles;
 export function Copyright() {
   return (
     <View style={container}>
-      <Text style={title}>Feito com amor por Andre_SDS</Text>
+      <Text style={title}>Feito com ♥ por Andre_SDS</Text>
     </View>
   );
 }

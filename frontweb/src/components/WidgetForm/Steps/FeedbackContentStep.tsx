@@ -1,7 +1,9 @@
 import {ArrowLeft} from "phosphor-react";
 import {FormEvent, useState} from "react";
 import {FeedbackType, feedbackTypes} from "..";
+import {api} from "../../../lib/api";
 import {CloseButton} from "../../CloseButton";
+import {Loading} from "../../Loading";
 import {ScreenShotButton} from "../../ScreenShotButton";
 
 interface FeedbackContentStepProps {
@@ -15,14 +17,21 @@ export const FeedbackContentStep = ({
   onRequestFeedbackRestart,
   onFeedbackSent,
 }: FeedbackContentStepProps) => {
-  const [screenShot, setScreenShot] = useState<string | null>(null);
+  const [screenshot, setScreenShot] = useState<string | null>(null);
   const [comment, setComment] = useState("");
+  const [isSendingFeedback, setIsSendingFeedback] = useState(false);
 
-  function handleSubmitFeedback(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmitFeedback(event: FormEvent<HTMLFormElement>) {
+    setIsSendingFeedback(true);
     event.preventDefault();
 
-    console.log({comment, screenShot});
+    await api.post("/feedbacks", {
+      type: feedbackType,
+      comment,
+      screenshot,
+    });
 
+    setIsSendingFeedback(false);
     onFeedbackSent();
   }
 
@@ -58,16 +67,16 @@ export const FeedbackContentStep = ({
 
         <footer className="flex gap-2 mt-2">
           <ScreenShotButton
-            screenShot={screenShot}
+            screenShot={screenshot}
             onScreenShotTook={setScreenShot}
           />
 
           <button
-            disabled={!comment}
+            disabled={comment.length === 0 || isSendingFeedback}
             type="submit"
             className="p-2 bg-brand-500 rounded-md border-transparent flex-1 flex justify-center items-center text-sm hover:bg-brand-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-900 focus:ring-brand-500 transition-color disabled:opacity-50 disabled:hover:bg-brand-500"
           >
-            Enviar feedback
+            {isSendingFeedback ? <Loading /> : "Enviar feedback"}
           </button>
         </footer>
       </form>
